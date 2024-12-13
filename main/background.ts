@@ -29,7 +29,6 @@ if (isProd) {
         const startUrl = `http://localhost:${port}/home`;
 
         await mainWindow.loadURL(startUrl);
-        // mainWindow.webContents.openDevTools();
     }
 })();
 

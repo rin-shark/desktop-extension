@@ -4,25 +4,34 @@ import Head from "next/head";
 
 export default function HomePage() {
     const [tabs, setTabs] = useState<
-        Array<{ id: number; viewId: string | null; title: string; url: string }>
+        Array<{
+            id: number;
+            viewId: string | null;
+            iconUrl: string | null;
+            title: string;
+            url: string;
+        }>
     >([
         {
             id: 1,
             viewId: null,
             title: "A",
             url: "https://www.youtube.com/",
+            iconUrl: "",
         },
         {
             id: 2,
             viewId: null,
             title: "B",
-            url: "https://github.com/",
+            url: "https://chatgpt.com/",
+            iconUrl: null,
         },
         {
             id: 3,
             viewId: null,
             title: "C",
-            url: "https://www.google.com/search?q=ashd&oq=ashd&gs_lcrp=EgZjaHJvbWUyBggAEEUYOdIBBzM2M2owajeoAgCwAgA&sourceid=chrome&ie=UTF-8",
+            url: "https://www.google.com/search?q=ashd&ie=UTF-8",
+            iconUrl: null,
         },
     ]);
 
@@ -71,11 +80,16 @@ export default function HomePage() {
                                     onClick={() => {
                                         setCurent(idx);
                                     }}
-                                    className={`flex items-center h-full w-52 px-2 ${
+                                    className={`cursor-pointer flex items-center h-full w-52 px-2 ${
                                         current === idx ? "bg-blue-300" : "bg-gray-300"
                                     }`}
                                     key={idx}
                                 >
+                                    <img
+                                        className="h-5 w-5"
+                                        src={t.iconUrl || ""}
+                                        alt="icon.url"
+                                    ></img>
                                     <p className="truncate">{t.title}</p>
                                 </div>
                             );

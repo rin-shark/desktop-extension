@@ -7,6 +7,7 @@ import {
     Menu,
     MenuItem,
     View,
+    webContents,
     WebContentsView,
 } from "electron";
 import serve from "electron-serve";
@@ -82,15 +83,20 @@ if (isProd) {
                 mainWindow.webContents.send("view-loading-return", viewInfo);
             });
 
-            view.webContents.on("page-title-updated", (event, title) => {
+            view.webContents.on("page-title-updated", async (event, title) => {
                 console.log("Page title updated:", title);
+                const icon = await getFaviconUrl(view.webContents);
+                console.log("🚀 ~ view.webContents.on ~ icon:", icon);
+
                 const viewInfo = {
                     id: data.view.id,
                     viewId: view.webContents.id,
                     title: view.webContents.getTitle(),
                     url: view.webContents.getURL(),
+                    iconUrl: icon,
                 };
                 console.log("🚀 ~ view.webContents.on ~ viewInfo:", viewInfo);
+
                 mainWindow.webContents.send("view-loading-return", viewInfo);
             });
 
@@ -107,8 +113,31 @@ if (isProd) {
         });
     });
 
-    ipcMain.on("get-view", async (_e, viewId: number) => {
-        //
+    ipcMain.on("go-back", async (_e, viewId: number) => {
+        const views = mainWindow.contentView.children;
+        views?.forEach((element: WebContentsView) => {
+            if (element.webContents.id === viewId) {
+                element.webContents.goBack();
+            }
+        });
+    });
+
+    ipcMain.on("go-next", async (_e, viewId: number) => {
+        const views = mainWindow.contentView.children;
+        views?.forEach((element: WebContentsView) => {
+            if (element.webContents.id === viewId) {
+                element.webContents.goForward();
+            }
+        });
+    });
+
+    ipcMain.on("view-reload", async (_e, viewId: number) => {
+        const views = mainWindow.contentView.children;
+        views?.forEach((element: WebContentsView) => {
+            if (element.webContents.id === viewId) {
+                element.webContents.reload();
+            }
+        });
     });
 
     ipcMain.on(
@@ -129,6 +158,30 @@ if (isProd) {
             });
         }
     );
+
+    // Function to extract the favicon URL
+    async function getFaviconUrl(webContents) {
+        // Execute JavaScript in the web page to get the favicon URL
+        try {
+            const result = await webContents.executeJavaScript(`
+        (() => {
+          const link = document.querySelector('link[rel="icon"]') || document.querySelector('link[rel="shortcut icon"]');
+          return link ? link.href : null;
+        })();
+      `);
+            console.log("🚀 ~ getFaviconUrl ~ result:", result);
+            if (!result) {
+                // If it's not a data URL, make it absolute using the page's base URL
+                const pageUrl = webContents.getURL();
+                const faviconUrl = new URL("/favicon.ico", pageUrl).href;
+                return faviconUrl;
+            }
+            return result;
+        } catch (error) {
+            console.error("Error fetching favicon URL:", error);
+            return null;
+        }
+    }
 
     ipcMain.on("open-dev-tool", () => {
         mainWindow.webContents.openDevTools();

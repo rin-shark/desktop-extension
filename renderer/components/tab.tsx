@@ -1,7 +1,13 @@
 import React, { FC, useEffect, useState } from "react";
 
 export const TabView: FC<{
-    tabInfo: { id: number; viewId: string | null; title: string; url: string };
+    tabInfo: {
+        id: number;
+        viewId: string | null;
+        iconUrl: string | null;
+        title: string;
+        url: string;
+    };
 }> = (props) => {
     const [url, setUrl] = useState(props.tabInfo?.url);
 
@@ -12,10 +18,28 @@ export const TabView: FC<{
     return (
         <div>
             <div className="flex gap-x-3 w-full p-2">
-                <div className="text-gray-700 flex justify-between gap-x-5 px-5 border border-gray-100 rounded-md">
-                    <button>pre</button>
-                    <button>next</button>
-                    <button>refresh</button>
+                <div className="text-gray-100 flex justify-between gap-x-5 px-5 border border-gray-100 rounded-md">
+                    <button
+                        onClick={() => {
+                            window.ipc.send("go-back", props?.tabInfo?.viewId);
+                        }}
+                    >
+                        pre
+                    </button>
+                    <button
+                        onClick={() => {
+                            window.ipc.send("go-next", props?.tabInfo?.viewId);
+                        }}
+                    >
+                        next
+                    </button>
+                    <button
+                        onClick={() => {
+                            window.ipc.send("view-reload", props?.tabInfo?.viewId);
+                        }}
+                    >
+                        refresh
+                    </button>
                 </div>
 
                 <input

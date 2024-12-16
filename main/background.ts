@@ -8,6 +8,7 @@ import {
     MenuItem,
     View,
     webContents,
+    screen,
     WebContentsView,
 } from "electron";
 import serve from "electron-serve";
@@ -24,16 +25,8 @@ if (isProd) {
 (async () => {
     await app.whenReady();
 
-    // const win = new BaseWindow({ width: 800, height: 600 });
-
     const mainWindow = createWindow("main", {
-        // fullscreen: true,
-        fullscreenable: true,
-        // height: 700,
-        // width: 900,
-        // titleBarStyle: "hidden",
-        autoHideMenuBar: true,
-
+        frame: false,
         icon: "resources/icon.ico",
         webPreferences: {
             nodeIntegration: true,
@@ -86,7 +79,6 @@ if (isProd) {
             view.webContents.on("page-title-updated", async (event, title) => {
                 console.log("Page title updated:", title);
                 const icon = await getFaviconUrl(view.webContents);
-                console.log("🚀 ~ view.webContents.on ~ icon:", icon);
 
                 const viewInfo = {
                     id: data.view.id,
@@ -95,7 +87,6 @@ if (isProd) {
                     url: view.webContents.getURL(),
                     iconUrl: icon,
                 };
-                console.log("🚀 ~ view.webContents.on ~ viewInfo:", viewInfo);
 
                 mainWindow.webContents.send("view-loading-return", viewInfo);
             });
@@ -185,21 +176,6 @@ if (isProd) {
 
     ipcMain.on("open-dev-tool", () => {
         mainWindow.webContents.openDevTools();
-    });
-
-    ipcMain.on("move-window", (event, { offsetX, offsetY }) => {
-        console.log("🚀 ~ ipcMain.on ~ offsetX:", offsetX);
-        console.log("🚀 ~ ipcMain.on ~ offsetY:", offsetY);
-        if (mainWindow) {
-            const bounds = mainWindow.getBounds();
-            console.log("🚀 ~ ipcMain.on ~ bounds:", bounds);
-            mainWindow.setBounds({
-                x: bounds.x + offsetX,
-                y: bounds.y + offsetY,
-                width: bounds.width,
-                height: bounds.height,
-            });
-        }
     });
 })();
 

@@ -186,6 +186,21 @@ if (isProd) {
     ipcMain.on("open-dev-tool", () => {
         mainWindow.webContents.openDevTools();
     });
+
+    ipcMain.on("move-window", (event, { offsetX, offsetY }) => {
+        console.log("🚀 ~ ipcMain.on ~ offsetX:", offsetX);
+        console.log("🚀 ~ ipcMain.on ~ offsetY:", offsetY);
+        if (mainWindow) {
+            const bounds = mainWindow.getBounds();
+            console.log("🚀 ~ ipcMain.on ~ bounds:", bounds);
+            mainWindow.setBounds({
+                x: bounds.x + offsetX,
+                y: bounds.y + offsetY,
+                width: bounds.width,
+                height: bounds.height,
+            });
+        }
+    });
 })();
 
 app.on("window-all-closed", () => {

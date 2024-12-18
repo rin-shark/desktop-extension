@@ -174,6 +174,15 @@ if (isProd) {
         }
     }
 
+    ipcMain.on("remove-view", (_e, viewId: number) => {
+        const views = mainWindow.contentView.children;
+        views?.forEach((element: WebContentsView) => {
+            if (element.webContents.id === viewId) {
+                mainWindow.contentView.removeChildView(element);
+            }
+        });
+    });
+
     ipcMain.on("open-dev-tool", () => {
         mainWindow.webContents.openDevTools();
     });

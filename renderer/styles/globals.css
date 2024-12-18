@@ -24,3 +24,23 @@
         -webkit-app-region: no-drag;
     }
 }
+
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .small-scrollbar::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    .small-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #06b6d4;
+    }
+}

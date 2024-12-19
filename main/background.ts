@@ -10,6 +10,7 @@ import {
     webContents,
     screen,
     WebContentsView,
+    globalShortcut,
 } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
@@ -27,6 +28,7 @@ if (isProd) {
 
     const mainWindow = createWindow("main", {
         frame: false,
+        transparent: true,
         icon: "resources/icon.ico",
         webPreferences: {
             nodeIntegration: true,
@@ -160,7 +162,6 @@ if (isProd) {
           return link ? link.href : null;
         })();
       `);
-            console.log("🚀 ~ getFaviconUrl ~ result:", result);
             if (!result) {
                 // If it's not a data URL, make it absolute using the page's base URL
                 const pageUrl = webContents.getURL();
@@ -183,8 +184,36 @@ if (isProd) {
         });
     });
 
-    ipcMain.on("open-dev-tool", () => {
-        mainWindow.webContents.openDevTools();
+    ipcMain.on("toggle-full-screen", () => {
+        if (mainWindow.isFocused()) {
+            mainWindow.setFullScreen(!mainWindow.isFullScreen());
+        }
+    });
+
+    ipcMain.on("quit", () => {
+        app.quit();
+    });
+
+    mainWindow.webContents.on("before-input-event", (event, input) => {
+        if (input.control && input.key.toLowerCase() === "t") {
+            console.log("Pressed Control+T");
+            mainWindow.webContents.send("create-new-tab");
+            event.preventDefault();
+        }
+    });
+    mainWindow.webContents.on("before-input-event", (event, input) => {
+        if (input.control && input.key.toLowerCase() === "w") {
+            console.log("Pressed Control+w");
+            mainWindow.webContents.send("close-current-tab");
+            event.preventDefault();
+        }
+    });
+    mainWindow.webContents.on("before-input-event", (event, input) => {
+        if (input.control && input.key.toLowerCase() === "f12") {
+            console.log("Pressed Control+f12");
+            mainWindow.webContents.openDevTools();
+            event.preventDefault();
+        }
     });
 })();
 
